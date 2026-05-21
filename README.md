@@ -1,52 +1,187 @@
-# CodeIgniter 4 Application Starter
+# 🛍️ GestiStore - Système de Vente Multi-Produits
 
-## What is CodeIgniter?
+## 📌 Vue d'Ensemble
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+Votre système de vente a été transformé d'un modèle **1 produit = 1 vente** vers un modèle **panier dynamique professionnel** permettant plusieurs produits par vente.
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+---
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## ✨ Nouvelles Fonctionnalités
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+### 1. **Panier Dynamique** 🛒
+- Ajouter plusieurs produits en une vente
+- Modifier quantités (+/- boutons)
+- Modifier prix unitaire à la volée
+- Supprimer articles du panier
+- Calcul automatique des totaux
+- Recherche produit en temps réel
 
-## Installation & updates
+### 2. **Gestion Multi-Produit**
+- Une facture = N produits
+- Table `sale_items` pour les articles
+- Historique complet par produit
+- Traçabilité prix unitaire personnalisé
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+### 3. **Historique Ventes**
+- Liste complète des ventes
+- Filtrage par client/date/montant
+- Accès aux détails de chaque facture
+- Statistiques par vente
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+### 4. **Détail Vente**
+- Affiche tous les produits achetés
+- Prix unitaire et sous-total
+- Récapitulatif financier
+- Prêt pour impression/PDF
 
-## Setup
+---
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+## 🚀 Démarrage Rapide
 
-## Important Change with index.php
+### 1. **Exécuter les Migrations**
+```bash
+php spark migrate
+```
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+Cette commande va :
+- ✅ Refactoriser la table `sales`
+- ✅ Créer la table `sale_items`
+- ✅ Migrer vos données existantes
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+### 2. **Tester le Panier**
+Allez à : `http://localhost/gestistore/sales/create`
 
-**Please** read the user guide for a better explanation of how CI4 works!
+### 3. **Consulter l'Historique**
+Allez à : `http://localhost/gestistore/sales/list`
 
-## Repository Management
+---
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+## 📁 Fichiers Créés/Modifiés
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+| Chemin | Type | Statut |
+|--------|------|--------|
+| `app/Database/Migrations/20260513000000_RefactorSalesTable.php` | Migration | ✅ Nouvelle |
+| `app/Database/Migrations/20260513010000_CreateSaleItemsTable.php` | Migration | ✅ Nouvelle |
+| `app/Models/SalesItemModel.php` | Modèle | ✅ Nouveau |
+| `app/Models/SalesModel.php` | Modèle | 🔄 Modifié |
+| `app/Controllers/Sales.php` | Contrôleur | 🔄 Refactorisé |
+| `app/Views/V_sales.php` | Vue | 🔄 Refactorisée |
+| `app/Views/V_sales_list.php` | Vue | ✅ Nouvelle |
+| `app/Views/V_sales_detail.php` | Vue | ✅ Nouvelle |
+| `app/Config/Routes.php` | Routes | 🔄 Mise à jour |
+
+---
+
+## 📚 Documentation
+
+### 📖 Guides Principaux
+
+1. **[IMPLEMENTATION_GUIDE.md](./IMPLEMENTATION_GUIDE.md)** 📋
+   - Étapes déploiement
+   - Structure tables
+   - Flux technique
+   - Tests recommandés
+
+2. **[API_DOCUMENTATION.md](./API_DOCUMENTATION.md)** 🔌
+   - Tous les endpoints AJAX
+   - Format requêtes/réponses
+   - Exemples JavaScript
+   - Erreurs courantes
+
+3. **[ARCHITECTURE.md](./ARCHITECTURE.md)** 🏗️
+   - Diagrammes de flux
+   - Relations BDD
+   - Structure fichiers
+   - Performance & scalabilité
+
+4. **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** 🐛
+   - Cas d'usage courants
+   - Dépannage
+   - Optimisations
+   - Checklist déploiement
+
+5. **[SQL_EXAMPLES.md](./SQL_EXAMPLES.md)** 📊
+   - Requêtes utiles
+   - Exemples données
+   - Dashboard queries
+   - Maintenance
+
+---
+
+## 🎯 Cas d'Usage Principal
+
+**Avant** (ancien système) :
+```
+Vente #1: Client: Junior | Produit: Huile | Qty: 2 | Prix: 1200 = 2400 FCFA
+Vente #2: Client: Junior | Produit: Riz | Qty: 1 | Prix: 5000 = 5000 FCFA
+Vente #3: Client: Junior | Produit: Sucre | Qty: 3 | Prix: 1000 = 3000 FCFA
+Total: 3 ventes
+```
+
+**Après** (nouveau système) :
+```
+Vente #123: Client: Junior | Mode: Espèces | Total: 10400 FCFA
+├─ Huile x2 @ 1200 = 2400
+├─ Riz x1 @ 5000 = 5000
+└─ Sucre x3 @ 1000 = 3000
+Total: 1 vente facture = professionnelle
+```
+
+---
+
+## 🚨 Points d'Attention
+
+### ⚠️ Avant Déploiement Production
+
+1. **Backup BDD** 📦
+   - Sauvegarder données actuelles
+
+2. **Tester Migrations** 🧪
+   - Exécuter sur copie dev
+   - Vérifier données migrées
+
+3. **Tests Complets** ✅
+   - Panier simple & multiple
+   - Crédit/Dette
+   - Historique & détails
+   - Mobile responsiveness
+
+4. **Vérifier logs** 📋
+   - Pas d'erreurs dans `writable/logs/`
+
+5. **Performance** ⚡
+   - < 2s chargement panier
+   - < 200ms par action AJAX
+
+---
+
+## 🎉 Résumé
+
+✅ **Système refactorisé** avec panier dynamique  
+✅ **Multi-produits par vente** (professionnelle)  
+✅ **UI/UX moderne** (mobile-first, dark mode)  
+✅ **Code propre** (Models, Controllers, Views séparés)  
+✅ **Documentation complète** (5 guides)  
+✅ **Prêt pour production** (après tests)  
+
+---
+
+**Version** : 1.0  
+**Date** : 13 May 2026  
+**Statut** : ✅ **Prêt pour Déploiement**
+
+---
+
+## 🎯 Next Action
+
+```bash
+1. php spark migrate           # Exécuter migrations
+2. Test /sales/create          # Tester panier
+3. Test /sales/list            # Tester historique
+4. Deploy en production         # Deployer
+```
+
+🚀 **Bon déploiement!**
 
 ## Server Requirements
 
