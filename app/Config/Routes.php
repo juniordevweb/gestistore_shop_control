@@ -5,6 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+$routes->get('manifest.webmanifest', 'Pwa::manifest');
 $routes->get('login', 'Auth::login');
 $routes->post('login', 'Auth::attempt');
 $routes->get('register', 'Auth::register');
@@ -13,6 +14,7 @@ $routes->get('logout', 'Auth::logout');
 
 $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('/', 'C_Dashboard::index');
+    $routes->get('admin/dashboard', 'C_Dashboard::index');
 
     // =========================
     // SALES / VENTES
@@ -43,6 +45,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
 
     // PARAMÈTRES
     $routes->get('settings', 'Settings::index');
+    $routes->get('settings/revenue', 'Settings::revenueReport');
     $routes->post('settings/updateProfile', 'Settings::updateProfile');
     $routes->post('settings/updateShopInfo', 'Settings::updateShopInfo');
     $routes->post('settings/changePassword', 'Settings::changePassword');

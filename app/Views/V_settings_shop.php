@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <?= view('pwa_head') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Paramètres Boutique - GestiStore</title>
@@ -155,6 +156,7 @@
 
         .period-metric.revenue .metric-value { color: var(--green); }
         .period-metric.recette .metric-value { color: var(--orange); }
+        .period-metric.dette .metric-value { color: var(--red); }
         .period-metric.sales .metric-value { color: #38bdf8; }
 
         .period-note { margin-top: 10px; color: var(--text-muted); font-size: .82rem; }
@@ -321,46 +323,14 @@
 
     <div class="glass-panel">
         <div class="section-title">
-            <i class="fa-solid fa-chart-simple text-success"></i>
-            Rapport de ventes
+            <i class="fa-solid fa-chart-column text-warning"></i>
+            Rapport mensuel
         </div>
-
-        <form method="get" action="<?= base_url('settings') ?>" class="period-panel">
-            <div class="period-form">
-                <div>
-                    <label class="form-label"><i class="fa-solid fa-calendar-day"></i> Date de début</label>
-                    <input type="date" name="from" class="form-control" value="<?= esc($sales_period['from'] ?? '') ?>">
-                </div>
-                <div>
-                    <label class="form-label"><i class="fa-solid fa-calendar-check"></i> Date de fin</label>
-                    <input type="date" name="to" class="form-control" value="<?= esc($sales_period['to'] ?? '') ?>">
-                </div>
-            </div>
-
-            <div class="period-actions">
-                <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-filter me-2"></i>Calculer le rapport</button>
-            </div>
-
-            <div class="period-summary">
-                <div class="period-metric revenue">
-                    <div class="metric-label">Total vendu</div>
-                    <div class="metric-value"><?= number_format((float) ($sales_period['total'] ?? 0), 0, ',', ' ') ?> FCFA</div>
-                </div>
-                <div class="period-metric recette">
-                    <div class="metric-label">Total recette</div>
-                    <div class="metric-value"><?= number_format((float) ($sales_period['recette'] ?? 0), 0, ',', ' ') ?> FCFA</div>
-                </div>
-                <div class="period-metric sales">
-                    <div class="metric-label">Nombre de ventes</div>
-                    <div class="metric-value"><?= (int) ($sales_period['count'] ?? 0) ?></div>
-                </div>
-            </div>
-
-            <div class="period-note">
-                Période affichée: du <strong><?= esc($sales_period['from'] ?? '') ?></strong> au <strong><?= esc($sales_period['to'] ?? '') ?></strong>.
-                La date de début peut rester vide pour prendre la première vente enregistrée.
-            </div>
-        </form>
+        <p class="text-muted mb-3">Voir le chiffre d'affaires et le bénéfice jour par jour pour le mois en cours.</p>
+        <a href="<?= base_url('settings/revenue') ?>" class="btn btn-primary w-100">
+            <i class="fa-solid fa-eye me-2"></i>
+            Voir chiffre d'affaires
+        </a>
     </div>
 
 </div>
@@ -384,5 +354,6 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<?= view('pwa_register') ?>
 </body>
 </html>

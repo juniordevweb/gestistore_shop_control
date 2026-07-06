@@ -77,6 +77,20 @@ class Settings extends BaseController
             ->get()
             ->getRowArray();
 
+        // Somme des ventes à crédit (dettes) pour cette période
+        $detteQuery = $db->table('sales');
+        if ($shopId) {
+            $detteQuery->where('shop_id', $shopId);
+        }
+
+        $detteRow = $detteQuery
+            ->selectSum('total', 'dette_amount')
+            ->where('payment_method', 'dette')
+            ->where('created_at >=', $startDate . ' 00:00:00')
+            ->where('created_at <=', $endDate . ' 23:59:59')
+            ->get()
+            ->getRowArray();
+
         $countQuery = $db->table('sales');
         if ($shopId) {
             $countQuery->where('shop_id', $shopId);
@@ -91,7 +105,8 @@ class Settings extends BaseController
             'from' => $startDate,
             'to' => $endDate,
             'total' => (float) ($periodRow['total_amount'] ?? 0),
-            'recette' => (float) ($recetteRow['recette_amount'] ?? 0),
+            'recette' => (float) max(0, ((float) ($periodRow['total_amount'] ?? 0) - (float) ($detteRow['dette_amount'] ?? 0))),
+            'dette' => (float) ($detteRow['dette_amount'] ?? 0),
             'count' => $salesCount,
             'first_sale' => $defaultStart,
         ];
@@ -159,6 +174,102 @@ class Settings extends BaseController
         ];
 
         return view('V_settings_shop', $data);
+    }
+
+    public function revenueReport()
+    {
+        $isAdmin = session()->get('is_admin');
+        $shopId = session()->get('shop_id');
+        $db = \Config\Database::connect();
+
+        $year = (int) ($this->request->getGet('year') ?: date('Y'));
+        $month = (int) ($this->request->getGet('month') ?: date('m'));
+        if ($month < 1 || $month > 12) {
+            $month = (int) date('m');
+        }
+        if ($year < 2000) {
+            $year = (int) date('Y');
+        }
+
+        $startDate = sprintf('%04d-%02d-01', $year, $month);
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        $salesQuery = $db->table('sales');
+        if (! $isAdmin) {
+            $salesQuery->where('shop_id', $shopId);
+        }
+
+        $salesRows = $salesQuery
+            ->select('DATE(created_at) AS sale_date, SUM(total) AS revenue', false)
+            ->where('created_at >=', $startDate . ' 00:00:00')
+            ->where('created_at <=', $endDate . ' 23:59:59')
+            ->groupBy('sale_date')
+            ->orderBy('sale_date', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $profitQuery = $db->table('sale_items si')
+            ->select('DATE(s.created_at) AS sale_date, SUM(si.benefice) AS profit', false)
+            ->join('sales s', 's.id = si.sale_id')
+            ->where('s.created_at >=', $startDate . ' 00:00:00')
+            ->where('s.created_at <=', $endDate . ' 23:59:59');
+
+        if (! $isAdmin) {
+            $profitQuery->where('s.shop_id', $shopId);
+        }
+
+        $profitRows = $profitQuery
+            ->groupBy('sale_date')
+            ->orderBy('sale_date', 'ASC')
+            ->get()
+            ->getResultArray();
+
+        $salesByDate = array_column($salesRows, 'revenue', 'sale_date');
+        $profitByDate = array_column($profitRows, 'profit', 'sale_date');
+
+        $daysInMonth = (int) date('t', strtotime($startDate));
+        $dailyData = [];
+        $totalRevenue = 0;
+        $totalProfit = 0;
+
+        $monthNames = [
+            '01' => 'Janvier',
+            '02' => 'Février',
+            '03' => 'Mars',
+            '04' => 'Avril',
+            '05' => 'Mai',
+            '06' => 'Juin',
+            '07' => 'Juillet',
+            '08' => 'Août',
+            '09' => 'Septembre',
+            '10' => 'Octobre',
+            '11' => 'Novembre',
+            '12' => 'Décembre',
+        ];
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $date = sprintf('%04d-%02d-%02d', $year, $month, $day);
+            $revenue = (float) ($salesByDate[$date] ?? 0);
+            $profit = (float) ($profitByDate[$date] ?? 0);
+            $dailyData[] = [
+                'date' => $date,
+                'label' => sprintf('%02d %s', $day, $monthNames[sprintf('%02d', $month)]),
+                'revenue' => $revenue,
+                'profit' => $profit,
+            ];
+            $totalRevenue += $revenue;
+            $totalProfit += $profit;
+        }
+
+        $data = [
+            'daily_data' => $dailyData,
+            'total_revenue' => $totalRevenue,
+            'total_profit' => $totalProfit,
+            'title' => 'Chiffre d\'affaires du mois',
+            'month_label' => sprintf('%s %04d', $monthNames[sprintf('%02d', $month)], $year),
+        ];
+
+        return view('V_settings_revenue_month', $data);
     }
 
     public function updateProfile()

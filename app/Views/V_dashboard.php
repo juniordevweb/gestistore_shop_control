@@ -15,6 +15,7 @@ $activeDebts = $active_debts ?? [
 <html lang="fr">
 
 <head>
+    <?= view('pwa_head') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GestiStore Senegal</title>
@@ -956,7 +957,7 @@ $activeDebts = $active_debts ?? [
     <!-- ───── BOTTOM NAVIGATION ───── -->
     <nav class="bottom-nav" aria-label="Navigation principale">
 
-        <a href="#" class="bn-item active" aria-current="page">
+        <a href="<?= base_url('/') ?>" class="bn-item active" aria-current="page">
             <i class="fa-solid fa-border-all" aria-hidden="true"></i>
             <div class="bn-dot"></div>
             <span>Accueil</span>
@@ -988,18 +989,7 @@ $activeDebts = $active_debts ?? [
 
     </nav>
 
-    <!-- JS pour activer l'onglet cliqué -->
-    <script>
-        document.querySelectorAll('.bn-item').forEach(function (item) {
-            item.addEventListener('click', function () {
-                document.querySelectorAll('.bn-item').forEach(function (el) {
-                    el.classList.remove('active');
-                });
-                this.classList.add('active');
-            });
-        });
-    </script>
-
+<?= view('pwa_register') ?>
 </body>
 
 </html>

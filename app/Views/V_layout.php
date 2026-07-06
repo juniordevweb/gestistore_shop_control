@@ -12,8 +12,7 @@ $navItems = [
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-        <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0d6efd">
+    <?= view('pwa_head') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GestiStore</title>
@@ -175,54 +174,6 @@ $navItems = [
 
 <?= $this->renderSection('scripts') ?>
 
-
-
-<script>
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/sw.js')
-        .then(function(registration) {
-            console.log('ServiceWorker enregistré avec succès:', registration.scope);
-        })
-        .catch(function(error) {
-            console.log('Erreur ServiceWorker:', error);
-        });
-    });
-}
-</script>
-
-<script>
-
-alert("JS CHARGE");
-
-console.log("TEST JS");
-
-if ('serviceWorker' in navigator) {
-
-    alert("SW SUPPORTE");
-
-    navigator.serviceWorker.register('/sw.js')
-    .then(function(reg) {
-
-        alert("SW OK");
-
-        console.log(reg);
-
-    })
-    .catch(function(err) {
-
-        alert("ERREUR SW");
-
-        console.error(err);
-
-    });
-
-} else {
-
-    alert("PAS DE SW");
-
-}
-
-</script>
+<?= view('pwa_register') ?>
 </body>
 </html>

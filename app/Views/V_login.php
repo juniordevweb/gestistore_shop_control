@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <?= view('pwa_head') ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - GestiStore</title>
@@ -83,5 +84,6 @@
         Pas encore de compte ? <a href="<?= base_url('register') ?>">Créer un compte</a>
     </div>
 </div>
+<?= view('pwa_register') ?>
 </body>
 </html>
